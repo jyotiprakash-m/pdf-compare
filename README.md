@@ -1,6 +1,6 @@
 # PDF Text Extractor
 
-A Next.js application that extracts text from PDF documents using their URLs.
+A Next.js application that extracts text from PDF documents and compare using their URLs.
 
 ## Features
 
@@ -9,6 +9,7 @@ A Next.js application that extracts text from PDF documents using their URLs.
 - Real-time text extraction and display
 - Error handling for invalid URLs or inaccessible PDFs
 - Responsive design for desktop and mobile devices
+- Compare difference between the two files
 
 ## Technology Stack
 
