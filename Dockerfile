@@ -1,5 +1,5 @@
 # Use an official Node.js image as the base
-FROM node:18-bullseye
+FROM node:18-bullseye-slim
 
 # Install poppler-utils
 RUN apt-get update && apt-get install -y poppler-utils && apt-get clean
