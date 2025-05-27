@@ -9,8 +9,12 @@ import "react-pdf/dist/Page/TextLayer.css";
 import ComparisonResult from "../../components/ComparisonResult";
 
 export default function Home() {
-  const [url1, setUrl1] = useState("http://localhost:3000/notebookLM1.pdf");
-  const [url2, setUrl2] = useState("http://localhost:3000/notebookLM2.pdf");
+  const [url1, setUrl1] = useState(
+    `${process.env.NEXT_PUBLIC_PUBLIC_URL}/notebookLM1.pdf`
+  );
+  const [url2, setUrl2] = useState(
+    `${process.env.NEXT_PUBLIC_PUBLIC_URL}/notebookLM2.pdf`
+  );
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
   const [totalPages1, setTotalPages1] = useState(1);
