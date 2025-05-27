@@ -6,6 +6,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/l
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import ComparisonResult from "../../components/ComparisonResult";
 
 export default function Home() {
   const [url1, setUrl1] = useState("http://localhost:3000/notebookLM1.pdf");
@@ -19,6 +20,12 @@ export default function Home() {
   const [errorDetails, setErrorDetails] = useState("");
   const [tab1, setTab1] = useState<"text" | "pdf">("pdf");
   const [tab2, setTab2] = useState<"text" | "pdf">("pdf");
+  const [model, setModel] = useState("openai");
+  const [compareResult, setCompareResult] = useState({
+    comparison: "",
+    model: "",
+  });
+  const [loadingCompare, setLoadingCompare] = useState(false);
 
   const containerRef1 = useRef<HTMLDivElement>(null);
   const containerRef2 = useRef<HTMLDivElement>(null);
@@ -107,6 +114,23 @@ export default function Home() {
     }
   };
 
+  const handleCompare = async () => {
+    try {
+      setLoadingCompare(true);
+      const res = await fetch("/api/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text1, text2, model }),
+      });
+      setLoadingCompare(false);
+      const data = await res.json();
+      setCompareResult(data);
+      console.log("Comparison result:", data); // replace with UI display
+    } catch (err) {
+      console.error("Comparison failed", err);
+    }
+  };
+
   return (
     <div className="min-h-screen p-8 max-w-6xl mx-auto">
       <header className="mb-8 text-center">
@@ -173,9 +197,9 @@ export default function Home() {
             {/* PDF 1 Panel */}
             <div
               ref={containerRef1}
-              className="border rounded-md p-2 bg-white shadow max-h-[600px] overflow-y-auto"
+              className="border rounded-md  bg-white shadow max-h-[600px] overflow-y-auto"
             >
-              <div className="flex space-x-2 border-b mb-2 pb-2">
+              <div className="flex space-x-2 border-b mb-2 p-2 sticky top-0 bg-white z-10">
                 <button
                   className={`flex-1 py-2 text-sm font-medium rounded-sm ${
                     tab1 === "text" ? "bg-blue-100" : "hover:bg-gray-100"
@@ -216,9 +240,9 @@ export default function Home() {
             {/* PDF 2 Panel */}
             <div
               ref={containerRef2}
-              className="border rounded-md p-2 bg-white shadow max-h-[600px] overflow-y-auto"
+              className="border rounded-md bg-white shadow max-h-[600px] overflow-y-auto"
             >
-              <div className="flex space-x-2 border-b mb-2 pb-2">
+              <div className="flex space-x-2 border-b mb-2 p-2 sticky top-0 bg-white z-10">
                 <button
                   className={`flex-1 py-2 text-sm font-medium rounded-sm ${
                     tab2 === "text" ? "bg-blue-100" : "hover:bg-gray-100"
@@ -255,6 +279,37 @@ export default function Home() {
                 </Document>
               )}
             </div>
+          </div>
+        )}
+
+        {text1 && text2 && (
+          <div>
+            <label
+              htmlFor="model"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              AI Model
+            </label>
+            <select
+              id="model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="openai">OpenAI (GPT-4)</option>
+              <option value="ollama">Ollama (Local LLM)</option>
+            </select>
+            <button
+              type="button"
+              onClick={handleCompare}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 mt-3 disabled:cursor-not-allowed"
+            >
+              {loadingCompare ? "Comparing..." : "Compare Texts"}
+            </button>
+
+            {compareResult.comparison && (
+              <ComparisonResult data={compareResult} />
+            )}
           </div>
         )}
 

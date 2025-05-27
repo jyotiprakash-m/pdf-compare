@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { spawn, exec } from 'child_process';
-import { Readable } from 'stream';
-import fetch from 'node-fetch';
-import { promisify } from 'util';
+import { type NextRequest, NextResponse } from "next/server";
+import { spawn, exec } from "node:child_process";
+import { Readable } from "node:stream";
+import fetch from "node-fetch";
+import { promisify } from "node:util";
 
 const execAsync = promisify(exec);
 
 // Check if pdftotext is installed
 async function isPdftotextInstalled(): Promise<boolean> {
   try {
-    await execAsync('which pdftotext');
+    await execAsync("which pdftotext");
     return true;
   } catch (error) {
     return false;
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     if (!url) {
       return NextResponse.json(
-        { error: 'PDF URL is required' },
+        { error: "PDF URL is required" },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       new URL(url);
     } catch (error) {
       return NextResponse.json(
-        { error: 'Invalid URL format' },
+        { error: "Invalid URL format" },
         { status: 400 }
       );
     }
@@ -41,9 +41,10 @@ export async function POST(request: NextRequest) {
     const pdftotextInstalled = await isPdftotextInstalled();
     if (!pdftotextInstalled) {
       return NextResponse.json(
-        { 
-          error: 'PDF extraction tool not found',
-          message: 'The pdftotext utility (part of poppler-utils) is required but not installed. Please install it using: sudo apt-get install poppler-utils'
+        {
+          error: "PDF extraction tool not found",
+          message:
+            "The pdftotext utility (part of poppler-utils) is required but not installed. Please install it using: sudo apt-get install poppler-utils",
         },
         { status: 500 }
       );
@@ -53,31 +54,36 @@ export async function POST(request: NextRequest) {
       // Download PDF directly as a buffer
       console.log(`Downloading PDF from ${url}`);
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to download PDF: ${response.statusText}`);
       }
-      
+
       const pdfBuffer = await response.arrayBuffer();
-      
+
       // Check if buffer is empty
       if (pdfBuffer.byteLength === 0) {
-        throw new Error('Downloaded file is empty');
+        throw new Error("Downloaded file is empty");
       }
 
       // Extract text using pdftotext with buffer input
-      console.log('Extracting text from PDF buffer');
-      const extractedText = await extractTextFromPdfBuffer(Buffer.from(pdfBuffer));
+      console.log("Extracting text from PDF buffer");
+      const extractedText = await extractTextFromPdfBuffer(
+        Buffer.from(pdfBuffer)
+      );
 
       return NextResponse.json({ text: extractedText });
     } catch (error) {
-      console.error('PDF processing error:', error);
+      console.error("PDF processing error:", error);
       throw error;
     }
   } catch (error) {
-    console.error('API error:', error);
+    console.error("API error:", error);
     return NextResponse.json(
-      { error: 'Failed to extract text from PDF', message: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: "Failed to extract text from PDF",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
@@ -91,47 +97,53 @@ async function extractTextFromPdfBuffer(pdfBuffer: Buffer): Promise<string> {
       const bufferStream = new Readable();
       bufferStream.push(pdfBuffer);
       bufferStream.push(null); // Signal the end of the stream
-      
+
       // Spawn pdftotext process with stdin/stdout pipes
-      const pdfToText = spawn('pdftotext', ['-', '-']);
-      
+      const pdfToText = spawn("pdftotext", ["-", "-"]);
+
       // Collect stdout chunks
       const chunks: Buffer[] = [];
-      pdfToText.stdout.on('data', (chunk) => {
+      pdfToText.stdout.on("data", (chunk) => {
         chunks.push(Buffer.from(chunk));
       });
-      
+
       // Handle process completion
-      pdfToText.on('close', (code) => {
+      pdfToText.on("close", (code) => {
         if (code !== 0) {
           reject(new Error(`pdftotext process exited with code ${code}`));
           return;
         }
-        
+
         // Combine chunks and convert to string
         const textBuffer = Buffer.concat(chunks);
-        resolve(textBuffer.toString('utf-8'));
+        resolve(textBuffer.toString("utf-8"));
       });
-      
+
       // Handle process errors
-      pdfToText.on('error', (err) => {
+      pdfToText.on("error", (err) => {
         reject(new Error(`pdftotext process error: ${err.message}`));
       });
-      
+
       // Handle stderr output
-      pdfToText.stderr.on('data', (data) => {
+      pdfToText.stderr.on("data", (data) => {
         console.error(`pdftotext stderr: ${data}`);
       });
-      
+
       // Pipe the PDF buffer to pdftotext's stdin
       bufferStream.pipe(pdfToText.stdin);
-      
+
       // Handle stdin errors
-      pdfToText.stdin.on('error', (err) => {
+      pdfToText.stdin.on("error", (err) => {
         reject(new Error(`pdftotext stdin error: ${err.message}`));
       });
     } catch (error) {
-      reject(new Error(`Failed to extract text: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      reject(
+        new Error(
+          `Failed to extract text: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        )
+      );
     }
   });
 }
