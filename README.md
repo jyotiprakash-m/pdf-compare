@@ -55,6 +55,34 @@ A Next.js application that extracts text from PDF documents and compare using th
 3. Click "Extract Text"
 4. View the extracted text below
 
+## Docker
+
+### Build the Docker image
+
+```bash
+docker build -t pdf-compare .
+```
+
+### OR pull the image
+
+```bash
+docker push jyotipm17/pdf-compare:latest
+```
+
+```bash
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_OLLAMA_URL=*** \
+  -e OPENAI_API_KEY=*** \
+  -e NEXT_PUBLIC_PUBLIC_URL=http://localhost:3000 \
+  pdf-compare
+```
+
+## OR pull the image
+
+```bash
+
+```
+
 ## Deployment
 
 This application can be deployed to any platform that supports Next.js applications, such as Vercel or Netlify. Make sure the deployment environment has poppler-utils installed.
