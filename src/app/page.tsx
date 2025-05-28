@@ -138,7 +138,7 @@ export default function Home() {
   return (
     <div className="min-h-screen p-8 max-w-6xl mx-auto">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">PDF Text Extractor</h1>
+        <h1 className="text-3xl font-bold mb-2">PDF Text Comparison</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Compare text from two PDF URLs
         </p>
@@ -330,7 +330,7 @@ export default function Home() {
       </main>
 
       <footer className="mt-12 pt-6 border-t text-center text-sm text-gray-500">
-        <p>PDF Text Extractor - Built with Next.js</p>
+        <p>PDF Text Comparison - Built with Next.js</p>
         <p>@author Jyoti Prakash Mohanta</p>
       </footer>
     </div>
