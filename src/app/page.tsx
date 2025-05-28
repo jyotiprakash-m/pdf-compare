@@ -323,13 +323,15 @@ export default function Home() {
             side-by-side.
           </p>
           <p className="mt-2 font-medium">
-            Note: Server must have poppler-utils installed.
+            Note: Server must have poppler-utils installed. (A Python
+            dependency)
           </p>
         </div>
       </main>
 
       <footer className="mt-12 pt-6 border-t text-center text-sm text-gray-500">
         <p>PDF Text Extractor - Built with Next.js</p>
+        <p>@author Jyoti Prakash Mohanta</p>
       </footer>
     </div>
   );
