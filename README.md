@@ -66,7 +66,7 @@ docker build -t pdf-compare .
 ### OR pull the image
 
 ```bash
-docker push jyotipm17/pdf-compare:latest
+docker pull jyotipm17/pdf-compare
 ```
 
 ```bash
